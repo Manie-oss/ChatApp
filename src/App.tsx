@@ -1,14 +1,31 @@
 // import { useState } from 'react'
-import { auth } from "./firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Navbar from "./components/Navbar";
+import Conversation from "./components/Conversation";
 import Chatbox from "./components/Chatbox";
-import Sendmsg from "./components/Sendmsg";
 import "./App.css";
 import Welcome from "./components/Welcome";
+import { auth, db } from "./firebase";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 
 function App() {
   const [user] = useAuthState(auth);
+  const onSendMessage = async (event: any) => {
+    const message = event.target[0]?.value?.trim();
+    event.preventDefault();
+    if (message === "") {
+      alert("Enter valid message");
+      return;
+    }
+    const { uid, displayName, photoURL } = auth.currentUser;
+    await addDoc(collection(db, "messages"), {
+      text: message,
+      name: displayName,
+      avatar: photoURL,
+      createdAt: serverTimestamp(),
+      uid,
+    });
+  };
   return (
     <>
       <div className="Navbar">
@@ -17,9 +34,10 @@ function App() {
       {!user ? (
         <Welcome />
       ) : (
-          <div className="Chatbox">
-            <Chatbox />
-          </div>
+        <>
+          <Conversation />
+          <Chatbox onSendMessage={onSendMessage} />
+        </>
       )}
     </>
   );
