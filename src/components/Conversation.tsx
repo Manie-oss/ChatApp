@@ -15,7 +15,7 @@ function Conversation() {
   const convRef: RefObject<HTMLDivElement | null> = useRef(null);
   const scrollConvBottom: any = () =>
     convRef.current?.scrollIntoView({
-      behavior: "smooth",
+      behavior: "instant",
       block: "end",
       inline: "nearest",
     });
